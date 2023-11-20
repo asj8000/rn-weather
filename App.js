@@ -1,25 +1,84 @@
-import React from 'react';
-import { StyleSheet, View, Text, ScrollView } from 'react-native';
+import * as Location from "expo-location";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  Dimensions,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
 
-const weatherData = [
-  { date: '11월 18일', high: 20, low: 10 },
-  { date: '11월 19일', high: 22, low: 12 },
-  { date: '11월 20일', high: 21, low: 11 },
-  { date: '11월 21일', high: 19, low: 9 },
-  { date: '11월 22일', high: 18, low: 8 },
-  { date: '11월 23일', high: 17, low: 7 },
-  { date: '11월 24일', high: 16, low: 6 },
-];
-
-const myLocation = getCurrentPositionAsync( )
+// const API_KEY = "-";
+const API_KEY = "-";
 
 export default function App() {
+  const [location, setLocation] = useState(null);
+  const [days, setDays] = useState([]);
+  const [weatherData, setWeatherData] = useState([
+    { date: "2023-11-01", high: 30, low: 20 },
+    { date: "2023-11-02", high: 31, low: 21 },
+    { date: "2023-11-03", high: 32, low: 22 },
+    { date: "2023-11-04", high: 33, low: 23 },
+    { date: "2023-11-05", high: 34, low: 24 },
+    { date: "2023-11-06", high: 35, low: 25 },
+    { date: "2023-11-07", high: 36, low: 26 },
+    { date: "2023-11-08", high: 37, low: 27 },
+    { date: "2023-11-09", high: 38, low: 28 },
+    { date: "2023-11-10", high: 39, low: 29 },
+  ]);
+
+  const getLoaction = async () => {
+    try {
+      await Location.requestForegroundPermissionsAsync();
+      const {
+        coords: { latitude, longitude },
+      } = await Location.getCurrentPositionAsync({ accuracy: 5 });
+      console.log(latitude, longitude);
+      return { latitude, longitude };
+    } catch (error) {
+      Alert.alert("Can't find you.");
+    }
+  };
+
+  const getWeather = async () => {
+    console.log("getWeather");
+    const coords = await getLoaction();
+    const { latitude, longitude } = coords;
+    const location = await Location.reverseGeocodeAsync(
+      { latitude, longitude },
+      { useGoogleMaps: false }
+    );
+    console.log(location);
+    setLocation(location);
+
+    // open weather api
+
+    const url  = `https://api.openweathermap.org/data/2.5/forecast/daily?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&mode=json&units=metric&lang=kr`;
+    console.log(url);
+    const response = await fetch(
+      url
+
+    );
+
+    const json = await response.json();
+    console.log(json);
+    setDays(json.daily);
+
+  };
+
+  useEffect(() => {
+    getLoaction();
+    getWeather();
+  }, []);
+
+
+  const regionString = location ? `${location[0].region} ${location[0].district}` : "Loading...";
   return (
     <View style={styles.container}>
       <View style={styles.topSection}>
         <View style={styles.temperatureSection}>
           <Text style={styles.temperatureText}>23°C</Text>
-          <Text>서울</Text>
+          <Text>{regionString}</Text>
           <Text>체감 25°C</Text>
         </View>
         <View style={styles.weatherIconSection}>
@@ -33,14 +92,14 @@ export default function App() {
       </View>
 
       <ScrollView style={styles.tableSection}>
-  {weatherData.map((item, index) => (
-    <View key={index} style={styles.tableRow}>
-      <Text style={styles.tableCell}>{item.date}</Text>
-      <Text style={styles.tableCell}>{item.high}°C</Text>
-      <Text style={styles.tableCell}>{item.low}°C</Text>
-    </View>
-  ))}
-</ScrollView>
+        {weatherData.map((item, index) => (
+          <View key={index} style={styles.tableRow}>
+            <Text style={styles.tableCell}>{item.date}</Text>
+            <Text style={styles.tableCell}>{item.high}°C</Text>
+            <Text style={styles.tableCell}>{item.low}°C</Text>
+          </View>
+        ))}
+      </ScrollView>
 
 
       <View style={styles.infoBoxesSection}>
@@ -117,3 +176,5 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 });
+
+
