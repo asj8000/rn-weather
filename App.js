@@ -7,9 +7,9 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
+import {OPEN_WEATHER_API_KEY} from "@env";
 
-// const API_KEY = "-";
-const API_KEY = "-";
+const API_KEY = OPEN_WEATHER_API_KEY;
 
 export default function App() {
   const [location, setLocation] = useState(null);
