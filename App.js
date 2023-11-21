@@ -10,8 +10,9 @@ import {
 import styled from "styled-components/native";
 import {OPEN_WEATHER_API_KEY} from "@env";
 import {LinearGradient} from "expo-linear-gradient";
-import CurrentForecast from "./components/CurrentForecast";
 import {useTailwind} from 'tailwind-rn';
+import CurrentForecastComponent from "./components/CurrentForecast";
+import HourlyWeather from "./components/HourlyWeather";
 
 const API_KEY = OPEN_WEATHER_API_KEY;
 
@@ -43,73 +44,58 @@ export default function App() {
     setLocation(location);
 
     const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&mode=json&units=metric&lang=kr`;
-    console.log(url);
-    const response = await fetch(url);
-    const json = await response.json();
-    setWeatherData(json.list);
-    const currentWeather = weatherData ? weatherData[0] : null;
-    setCurrentWeather(currentWeather);
+
+    fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setWeatherData(data.list);
+      })
+      .catch((error) => {
+        console.warn(error);
+      }
+    );
   };
+
+  useEffect(() => {
+    setCurrentWeather(weatherData ? weatherData[0] : null);
+  }, [weatherData]);
 
   useEffect(() => {
     getWeather();
   }, []);
 
 
-  console.log("currentWeather");
-  console.log(currentWeather);
 
   const regionString = location ? `${location[0]?.region} ${location[0]?.district}` : "Loading...";
   return (
     <Container>
-      <LinearGradient
-        colors={['#4c669f', '#3b5998', '#050550']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={{height: '100%',
-          justifyContent: 'center',
-          alignItems: 'center',
-          borderRadius: 5}}
-      >
-        <View style={styles.container}>
-          <View style={styles.topSection}>
-            <View style={styles.topLeftSection}>
-              <Text style={styles.CurrentTemp}>{currentWeather?.main?.temp}°</Text>
-              <Text style={styles.CurrentWeatherDescription}>{currentWeather?.weather[0]?.description}</Text>
-              <Text style={styles.CurrentRegion}>{regionString}</Text>
-              <Text style={styles.CurrentTempDescription}>{currentWeather?.main?.temp_max}° / {currentWeather?.main?.temp_min}° 체감온도 {currentWeather?.main?.feels_like}°</Text>
+      <ScrollView style={styles.scrollView}>
+        <LinearGradient
+          colors={['#0d5acc', '#3b5998', '#050550']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{height: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 5}}
+        >
+          <View style={styles.container}>
+            <View style={styles.topSection}>
+              <CurrentForecastComponent currentWeather={currentWeather} regionString={regionString} />
             </View>
-            <View style={styles.topRightSection}>
-              <Text>{currentWeather?.weather[0]?.icon}</Text>
-              {currentWeather?.weather[0]?.icon && (
-                <Image
-                  style={styles.weatherIconSection}
-
-                  source={{
-                    uri: `http://openweathermap.org/img/wn/${currentWeather?.weather[0]?.icon}@2x.png`,
-                  }}
-                  resizeMode={"contain"}
-                />
-              )}
+            <View style={styles.hourlyWeatherSection}>
+              <HourlyWeather hourlyData={weatherData} />
+            </View>
+            <View style={styles.temperatureSection}>
+              <View></View>
+            </View>
+            <View style={styles.temperatureSection}>
+              <View></View>
             </View>
           </View>
-          <View style={styles.temperatureSection}>
-          </View>
-        </View>
-        {/*<View style={tailwind('pt-12 items-center')}>*/}
-        {/*  <View style={styles.temperatureSection}>*/}
-        {/*    <Text style={styles.temperatureText}>{currentWeather?.main?.temp}°C</Text>*/}
-        {/*    <Text>{regionString}</Text>*/}
-        {/*    <Text>체감 {currentWeather?.main?.feels_like}</Text>*/}
-        {/*  </View>*/}
-        {/*  <View style={styles.weatherIconSection}>*/}
-        {/*    <Text>{currentWeather?.weather[0]?.icon}</Text>*/}
-        {/*  </View>*/}
-        {/*</View>*/}
-        {/*<View><Text>{location}</Text></View>*/}
-        {/*<View><Text>{}</Text></View>*/}
-        {/*<CurrentForecast currentWeather={currentWeather} />*/}
-      </LinearGradient>
+        </LinearGradient>
+      </ScrollView>
     </Container>
   );
 }
@@ -129,6 +115,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width : '100%',
     padding: 30,
+    color: 'white',
   },
   gradient: {
     width: 300,
@@ -138,47 +125,21 @@ const styles = StyleSheet.create({
     borderRadius: 5
   },
   topSection: {
-    flex: 1,
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
+    // flex: 1,
+    height: 275,
+    // backgroundColor: 'pink',
   },
-  topLeftSection: {
-    flex: 1,
-    width: '50%',
-    paddingTop: 80,
-  },
-  CurrentTemp: {
-    fontSize: 60,
-    fontWeight: 'bold',
-  },
-  CurrentWeatherDescription: {
-    fontSize: 20,
-    marginTop: 15,
-    marginBottom: 15,
-  },
-  CurrentRegion: {
-    fontSize: 20,
-  },
-  CurrentTempDescription: {
-    fontSize: 16,
-
-  },
-  topRightSection: {
-    flex: 1,
-    width: '50%',
-    backgroundColor: 'pink',
-  },
-  weatherIconSection: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 50,
-    height: 50,
+  hourlyWeatherSection: {
+    // flex: 1,
+    height: 175,
+    // backgroundColor: 'gray',
+    marginTop: 40,
   },
   temperatureSection: {
-    flex:2,
+    // flex: 1,
+    height: 300,
     width: '100%',
+    marginTop: 40,
     backgroundColor: 'gray',
     justifyContent: 'center',
   },
