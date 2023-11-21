@@ -1,17 +1,22 @@
 import * as Location from "expo-location";
 import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
   StyleSheet,
   ScrollView,
   Alert,
+  Image,
+  Text, View,
 } from "react-native";
+import styled from "styled-components/native";
 import {OPEN_WEATHER_API_KEY} from "@env";
+import {LinearGradient} from "expo-linear-gradient";
+import CurrentForecast from "./components/CurrentForecast";
+import {useTailwind} from 'tailwind-rn';
 
 const API_KEY = OPEN_WEATHER_API_KEY;
 
 export default function App() {
+  const tailwind = useTailwind();
   const [location, setLocation] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
   const [currentWeather, setCurrentWeather] = useState(null);
@@ -50,69 +55,70 @@ export default function App() {
     getWeather();
   }, []);
 
+
+  console.log("currentWeather");
+  console.log(currentWeather);
+
   const regionString = location ? `${location[0]?.region} ${location[0]?.district}` : "Loading...";
   return (
-      <ScrollView style={styles.scrollView}>
+    <Container>
+      <LinearGradient
+        colors={['#4c669f', '#3b5998', '#050550']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{height: '100%',
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderRadius: 5}}
+      >
         <View style={styles.container}>
           <View style={styles.topSection}>
-            <View style={styles.temperatureSection}>
-              <Text style={styles.temperatureText}>{currentWeather?.main?.temp}°C</Text>
-              <Text>{regionString}</Text>
-              <Text>체감 {currentWeather?.main?.feels_like}</Text>
+            <View style={styles.topLeftSection}>
+              <Text style={styles.CurrentTemp}>{currentWeather?.main?.temp}°</Text>
+              <Text style={styles.CurrentWeatherDescription}>{currentWeather?.weather[0]?.description}</Text>
+              <Text style={styles.CurrentRegion}>{regionString}</Text>
+              <Text style={styles.CurrentTempDescription}>{currentWeather?.main?.temp_max}° / {currentWeather?.main?.temp_min}° 체감온도 {currentWeather?.main?.feels_like}°</Text>
             </View>
-            <View style={styles.weatherIconSection}>
+            <View style={styles.topRightSection}>
               <Text>{currentWeather?.weather[0]?.icon}</Text>
+              {currentWeather?.weather[0]?.icon && (
+                <Image
+                  style={styles.weatherIconSection}
+
+                  source={{
+                    uri: `http://openweathermap.org/img/wn/${currentWeather?.weather[0]?.icon}@2x.png`,
+                  }}
+                  resizeMode={"contain"}
+                />
+              )}
             </View>
           </View>
-          <View style={styles.graphSection}></View>
-          <ScrollView style={styles.tableSection}>
-            <View style={styles.tableRow}>
-              <Text style={styles.tableCell}>시간</Text>
-              <Text style={styles.tableCell}>날씨</Text>
-              <Text style={styles.tableCell}>강수확률</Text>
-              <Text style={styles.tableCell}>강수량</Text>
-              <Text style={styles.tableCell}>습도</Text>
-              <Text style={styles.tableCell}>풍속</Text>
-            </View>
-            {weatherData && weatherData.map((item, index) => (
-              <View style={styles.tableRow} key={index}>
-                <Text style={styles.tableCell}>{new Date(item.dt * 1000).toLocaleTimeString()}</Text>
-                <Text style={styles.tableCell}>{item.weather[0].description}</Text>
-                <Text style={styles.tableCell}>{item.pop}%</Text>
-                <Text style={styles.tableCell}>{item.rain ? item.rain["3h"] : 0}mm</Text>
-                <Text style={styles.tableCell}>{item.main.humidity}%</Text>
-                <Text style={styles.tableCell}>{item.wind.speed}m/s</Text>
-              </View>
-            ))}
-          </ScrollView>
-          <View style={styles.infoBoxesSection}>
-            <View style={styles.infoBox}>
-              <Text>일출</Text>
-              <Text>06:00</Text>
-            </View>
-            <View style={styles.infoBox}>
-              <Text>일출</Text>
-              <Text>06:00</Text>
-            </View>
-            <View style={styles.infoBox}>
-              <Text>일출</Text>
-              <Text>06:00</Text>
-            </View>
-            <View style={styles.infoBox}>
-              <Text>일출</Text>
-              <Text>06:00</Text>
-            </View>
-          </View>
-          <View style={styles.infoBoxesSection}>
-            <View style={styles.infoBox}>
-              <Text>일출</Text>
-              <Text>06:00</Text>
-            </View>
+          <View style={styles.temperatureSection}>
           </View>
         </View>
-      </ScrollView>
+        {/*<View style={tailwind('pt-12 items-center')}>*/}
+        {/*  <View style={styles.temperatureSection}>*/}
+        {/*    <Text style={styles.temperatureText}>{currentWeather?.main?.temp}°C</Text>*/}
+        {/*    <Text>{regionString}</Text>*/}
+        {/*    <Text>체감 {currentWeather?.main?.feels_like}</Text>*/}
+        {/*  </View>*/}
+        {/*  <View style={styles.weatherIconSection}>*/}
+        {/*    <Text>{currentWeather?.weather[0]?.icon}</Text>*/}
+        {/*  </View>*/}
+        {/*</View>*/}
+        {/*<View><Text>{location}</Text></View>*/}
+        {/*<View><Text>{}</Text></View>*/}
+        {/*<CurrentForecast currentWeather={currentWeather} />*/}
+      </LinearGradient>
+    </Container>
   );
 }
+
+const Container = styled.View`
+  flex: 1;
+  background-color: dodgerblue;
+`;
+
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -121,7 +127,8 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 20,
+    width : '100%',
+    padding: 30,
   },
   gradient: {
     width: 300,
@@ -132,22 +139,52 @@ const styles = StyleSheet.create({
   },
   topSection: {
     flex: 1,
+    width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 20,
   },
-  temperatureSection: {
-    justifyContent: 'center',
+  topLeftSection: {
+    flex: 1,
+    width: '50%',
+    paddingTop: 80,
   },
-  temperatureText: {
-    fontSize: 24,
+  CurrentTemp: {
+    fontSize: 60,
     fontWeight: 'bold',
+  },
+  CurrentWeatherDescription: {
+    fontSize: 20,
+    marginTop: 15,
+    marginBottom: 15,
+  },
+  CurrentRegion: {
+    fontSize: 20,
+  },
+  CurrentTempDescription: {
+    fontSize: 16,
+
+  },
+  topRightSection: {
+    flex: 1,
+    width: '50%',
+    backgroundColor: 'pink',
   },
   weatherIconSection: {
     justifyContent: 'center',
     alignItems: 'center',
     width: 50,
     height: 50,
+  },
+  temperatureSection: {
+    flex:2,
+    width: '100%',
+    backgroundColor: 'gray',
+    justifyContent: 'center',
+  },
+  temperatureText: {
+    fontSize: 24,
+    fontWeight: 'bold',
   },
   graphSection: {
     flex: 5,
