@@ -10,14 +10,13 @@ import {
 import styled from "styled-components/native";
 import {OPEN_WEATHER_API_KEY} from "@env";
 import {LinearGradient} from "expo-linear-gradient";
-import {useTailwind} from 'tailwind-rn';
 import CurrentForecastComponent from "./components/CurrentForecast";
 import HourlyWeather from "./components/HourlyWeather";
+import HourlyWeatherItem from "./components/DetailForecast";
 
 const API_KEY = OPEN_WEATHER_API_KEY;
 
 export default function App() {
-  const tailwind = useTailwind();
   const [location, setLocation] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
   const [currentWeather, setCurrentWeather] = useState(null);
@@ -88,10 +87,7 @@ export default function App() {
               <HourlyWeather hourlyData={weatherData} />
             </View>
             <View style={styles.temperatureSection}>
-              <View></View>
-            </View>
-            <View style={styles.temperatureSection}>
-              <View></View>
+              <HourlyWeatherItem currentWeather={currentWeather} />
             </View>
           </View>
         </LinearGradient>
@@ -137,10 +133,9 @@ const styles = StyleSheet.create({
   },
   temperatureSection: {
     // flex: 1,
-    height: 300,
+    height: 450,
     width: '100%',
-    marginTop: 40,
-    backgroundColor: 'gray',
+    // backgroundColor: 'gray',
     justifyContent: 'center',
   },
   temperatureText: {

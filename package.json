@@ -19,10 +19,7 @@
     "react-native": "0.72.6",
     "react-native-dotenv": "^3.4.9",
     "react-native-web": "~0.19.6",
-    "styled-components": "^6.1.1",
-    "tailwind-rn": "^4.2.0",
-    "typescript": "^5.1.3",
-    "@types/react": "~18.2.14"
+    "styled-components": "^6.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

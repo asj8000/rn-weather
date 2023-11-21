@@ -80,7 +80,7 @@ const HourlyWeather = ({ hourlyData }) => {
             <Text style={styles.timeText}>{getHour(hour.dt_txt)}</Text>
             <Image source={{ uri: `http://openweathermap.org/img/wn/${hour?.weather[0]?.icon}@4x.png`, }} style={styles.weatherIcon} />
             <Text style={styles.temperatureText}>{hour?.main?.temp}°C</Text>
-            <Text style={styles.humidityText}>{hour?.main?.humidity}%</Text>
+            <Text style={styles.humidityText}>{hour?.pop}%</Text>
           </View>
         ))}
       </ScrollView>
