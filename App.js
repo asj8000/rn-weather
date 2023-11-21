@@ -17,7 +17,6 @@ import HourlyWeather from "./components/HourlyWeather";
 const API_KEY = OPEN_WEATHER_API_KEY;
 
 export default function App() {
-  const tailwind = useTailwind();
   const [location, setLocation] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
   const [currentWeather, setCurrentWeather] = useState(null);
